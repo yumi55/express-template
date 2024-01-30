@@ -6,10 +6,6 @@
   "scripts": {
     "dev": "nodemon ./app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@gitee.com:xilinglaoshi1/expresstemplate.git"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
