@@ -4,7 +4,7 @@ exports.register = async (req, res) => {
     const userModel = new User(req.body)
     const dbBack = await userModel.save()
     const user = dbBack.toJSON()
-    delete user.password
+    delete user.password // 保存还在显示password 则需要手动删除
     res.status(201).json({
         user
     })
