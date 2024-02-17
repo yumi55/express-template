@@ -1,4 +1,5 @@
 const { User } = require('../model/index')
+const { createToken } = require('../util/jwt')
 exports.register = async (req, res) => {
     const userModel = new User(req.body)
     const dbBack = await userModel.save()
@@ -10,14 +11,13 @@ exports.register = async (req, res) => {
 };
 // 用户登录
 exports.login = async (req, res) => {
-    // 客户端数据验证
-    // 链接数据库查询
-    var dbBack = await User.findOne(req.body)
-    if (!dbBack) {
-        res.status(402).json({ error: "邮箱或者密码不正确" })
+    let userinfo = await User.findOne(req.body)
+    if (!userinfo) {
+        return res.status(401).json({ msg: '邮箱或密码错误！' })
     }
-    // dbBack = dbBack.toJSON()
-    res.status(200).json(dbBack)
+    userinfo = userinfo.toJSON()
+    userinfo.token = await createToken(userinfo)
+    res.status(200).json(userinfo)
 }
 exports.list = (req, res) => {
     res.send('list-user');
