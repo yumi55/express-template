@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-router.use('/user', require('./user'));
-router.use('/video', require('./video'));
+router.get('/lists', (req, res) => {
+    res.send('video-list');
+});
 
 module.exports = router;
