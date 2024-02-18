@@ -21,6 +21,7 @@ module.exports.register = validator([
         .notEmpty().withMessage('密码不能为空').bail()
         .isLength({ min: 5 }).withMessage('用户名长度不能小于5').bail(),
 ])
+// 登录
 module.exports.login = validator([
     body('email')
         .notEmpty().withMessage('email is empty').bail()
