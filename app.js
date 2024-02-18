@@ -6,6 +6,8 @@ const router = require('./router');
 
 app.use(express.json()); // 支持数据json
 app.use(express.urlencoded());
+// http://localhost:3000/xx.jpg直接获取文件夹内的资源
+app.use(express.static('public'))
 app.use(cors()); // 支持跨域
 app.use(morgan('dev')); // 支持日志记录
 app.use('/api/v1', router); // 若请求路径为/api/v1则到router处理
