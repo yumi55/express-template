@@ -59,9 +59,31 @@ exports.headimg = async (req, res) => {
         res.status(500).json({ err: error })
     }
 }
-exports.list = (req, res) => {
-    res.send('list-user');
-};
-exports.delete = (req, res) => {
-    res.send('delete-user');
+exports.list = async (req, res) => {
+    try {
+        const { pageNum = 1, pageSize = 10 } = req.body
+        const list = await User.find()
+            .skip((pageNum - 1) * pageSize)
+            .limit(pageSize)
+            .sort({ updateAt: -1 })
+        const total = await User.countDocuments() //  获取list总数
+        res.status(200).json({ list, total })
+    } catch (e) {
+        res.status(500).json({ msg: e })
+    }
+}
+
+exports.delete = async (req, res) => {
+    try {
+        const { id } = req.params
+        const dbBack = await User.findOne({ _id: id })
+        console.log(dbBack)
+        if (dbBack) {
+            await dbBack.deleteOne({ _id: id })
+            res.status(200).json({ msg: '删除用户成功！' })
+        }
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({ msg: e })
+    }
 };
