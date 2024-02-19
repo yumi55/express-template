@@ -14,18 +14,22 @@ module.exports.createToken = async userInfo => {
     )
 }
 
-module.exports.verifyToken = async (req, res, next) => {
-    let token = req.headers.authorization
-    token = token ? token.split("Bearer ")[1] : null
-    if (token) {
-        try {
-            const userInfo = await verify(token, uuid)
-            req.userInfo = userInfo // 中间件直接改了req，后面的请求的req也可以获取userInfo信息
+module.exports.verifyToken = (require = true) => {
+    return async (req, res, next) => {
+        let token = req.headers.authorization
+        token = token ? token.split("Bearer ")[1] : null
+        if (token) {
+            try {
+                const userInfo = await verify(token, uuid)
+                req.userInfo = userInfo // 中间件直接改了req，后面的请求的req也可以获取userInfo信息
+                next()
+            } catch (err) {
+                res.status(402).json({ error: "token失效，请重新登录！" })
+            }
+        } else if (require) {
+            res.status(402).json({ error: "请先登录！" })
+        } else {
             next()
-        } catch (err) {
-            res.status(402).json({ error: "token失效，请重新登录！" })
         }
-    } else {
-        res.status(402).json({ error: "请先登录！" })
     }
 }
