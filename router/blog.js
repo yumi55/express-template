@@ -5,8 +5,6 @@ const blogValidator = require('../middleware/validator/blogValidator')
 const { verifyToken } = require('../util/jwt')
 router
     .post('/', verifyToken, blogValidator.add, blogController.add)
-    .get('/list', (req, res) => {
-        res.send('list');
-    })
+    .get('/list', verifyToken, blogController.list)
 
 module.exports = router;
