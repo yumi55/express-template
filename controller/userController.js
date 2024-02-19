@@ -77,13 +77,11 @@ exports.delete = async (req, res) => {
     try {
         const { id } = req.params
         const dbBack = await User.findOne({ _id: id })
-        console.log(dbBack)
         if (dbBack) {
             await dbBack.deleteOne({ _id: id })
             res.status(200).json({ msg: '删除用户成功！' })
         }
     } catch (e) {
-        console.log(e)
         res.status(500).json({ msg: e })
     }
 };
