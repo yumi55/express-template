@@ -24,6 +24,17 @@ exports.list = async (req, res) => {
         res.status(500).json({ msg: e })
     }
 }
+exports.detail = async (req, res) => {
+    try {
+        const { id } = req.params
+        const dbBack = await Blog
+            .findById(id)
+            .populate('user', '_id name')
+        res.status(200).json({ data: dbBack })
+    } catch (e) {
+        res.status(500).json({ msg: e })
+    }
+}
 exports.template = async (req, res) => {
     try {
         // res.status(200).json({ dbBack })
