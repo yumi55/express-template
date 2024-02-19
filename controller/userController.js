@@ -1,4 +1,4 @@
-const { User } = require('../model/index')
+const { User, Like } = require('../model/index')
 const { createToken } = require('../util/jwt')
 const fs = require('fs')
 const { promisify } = require('util')
@@ -59,6 +59,7 @@ exports.headimg = async (req, res) => {
         res.status(500).json({ err: error })
     }
 }
+// 用户列表
 exports.list = async (req, res) => {
     try {
         const { pageNum = 1, pageSize = 10 } = req.body
@@ -72,7 +73,7 @@ exports.list = async (req, res) => {
         res.status(500).json({ msg: e })
     }
 }
-
+// 删除用户
 exports.delete = async (req, res) => {
     try {
         const { id } = req.params
@@ -82,6 +83,56 @@ exports.delete = async (req, res) => {
             res.status(200).json({ msg: '删除用户成功！' })
         }
     } catch (e) {
+        res.status(500).json({ msg: e })
+    }
+};
+// 点赞博客
+exports.like = async (req, res) => {
+    try {
+        const { id: blogId } = req.params
+        const userId = req.userInfo.userInfo._id
+        const record = await Like.findOne({
+            userId: userId,
+            blogId: blogId
+        })
+        if (!record) {
+            await new Like({
+                userId: userId,
+                blogId: blogId
+            }).save()
+            const user = await User.findById(userId)
+            user.likes ? user.likes.push(blogId) : [blogId]
+            user.save()
+            res.status(200).json({ msg: '点赞博客成功！' })
+        } else {
+            res.status(500).json({ msg: '你已经点赞了！' })
+        }
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({ msg: e })
+    }
+};
+// 取消点赞博客
+exports.unlike = async (req, res) => {
+    try {
+        const { id: blogId } = req.params
+        const userId = req.userInfo.userInfo._id
+        const record = await Like.findOne({
+            userId: userId,
+            blogId: blogId
+        })
+        if (record) {
+            await Like.deleteOne({ _id: record._id })
+            const user = await User.findById(userId)
+            const index = user.likes.findIndex(item => item === blogId)
+            user.likes.splice(index, 1)
+            user.save()
+            res.status(200).json({ msg: '取消点赞博客成功！' })
+        } else {
+            res.status(500).json({ msg: '你没有点赞过该博客！' })
+        }
+    } catch (e) {
+        console.log(e)
         res.status(500).json({ msg: e })
     }
 };
