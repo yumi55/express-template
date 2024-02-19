@@ -13,4 +13,5 @@ main().then(res => {
 
 module.exports = {
     User: mongoose.model('User', require('./userModel')),
+    Blog: mongoose.model('Blog', require('./blogModel')),
 }
