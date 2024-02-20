@@ -24,7 +24,7 @@ exports.login = async (req, res) => {
 }
 // 更改用户信息
 exports.update = async (req, res) => {
-    const id = req.userInfo.userInfo._id
+    const id = req.user.userInfo._id
     const dbBack = await User.findByIdAndUpdate(id, req.body, { new: true })
     res.status(202).json({ user: dbBack })
 }
@@ -48,7 +48,7 @@ exports.headimg = async (req, res) => {
             './public/' + filename,
             './public/' + filename + '.' + suffix
         )
-        const id = req.userInfo.userInfo._id
+        const id = req.user.userInfo._id
         await User.findByIdAndUpdate(id, {
             image: filename + '.' + suffix
         }, { new: true })
@@ -90,7 +90,7 @@ exports.delete = async (req, res) => {
 exports.like = async (req, res) => {
     try {
         const { id: blogId } = req.params
-        const userId = req.userInfo.userInfo._id
+        const userId = req.user.userInfo._id
         const record = await Like.findOne({
             userId: userId,
             blogId: blogId
@@ -116,7 +116,7 @@ exports.like = async (req, res) => {
 exports.unlike = async (req, res) => {
     try {
         const { id: blogId } = req.params
-        const userId = req.userInfo.userInfo._id
+        const userId = req.user.userInfo._id
         const record = await Like.findOne({
             userId: userId,
             blogId: blogId

@@ -1,8 +1,9 @@
-const { Blog } = require('../model/index')
+const { Blog, Like } = require('../model/index')
+const lodash = require('lodash')
 exports.add = async (req, res) => {
     try {
         const add = req.body
-        add.user = req.userInfo.userInfo._id
+        add.user = req.user.userInfo._id
         const blogModel = new Blog(add)
         const dbBack = await blogModel.save()
         res.status(200).json({ dbBack })
@@ -26,12 +27,33 @@ exports.list = async (req, res) => {
 }
 exports.detail = async (req, res) => {
     try {
-        const { id } = req.params
+        const { id: blogId } = req.params
         const dbBack = await Blog
-            .findById(id)
+            .findById(blogId)
             .populate('user', '_id name')
-        res.status(200).json({ data: dbBack })
+        if (req.user) {
+            // 判断是否有点赞该博客
+            const userId = req.user.userInfo._id
+            const record = await Like.findOne({
+                userId,
+                blogId
+            })
+            dbBack.isLike = !!record
+        }
+        const data = lodash.pick(dbBack, [
+            '_id',
+            'name',
+            'title',
+            'content',
+            'cover',
+            'isLike'
+        ])
+        if (!data.isLike) {
+            data.isLike = false
+        }
+        res.status(200).json({ data })
     } catch (e) {
+        console.log(e)
         res.status(500).json({ msg: e })
     }
 }

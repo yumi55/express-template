@@ -21,7 +21,7 @@ module.exports.verifyToken = (require = true) => {
         if (token) {
             try {
                 const userInfo = await verify(token, uuid)
-                req.userInfo = userInfo // 中间件直接改了req，后面的请求的req也可以获取userInfo信息
+                req.user = userInfo // 中间件直接改了req，后面的请求的req也可以获取userInfo信息
                 next()
             } catch (err) {
                 res.status(402).json({ error: "token失效，请重新登录！" })
