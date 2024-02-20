@@ -6,8 +6,8 @@ const validator = require('./errorBack')
 // bail只对当前name中的多个校验中，若前者校验错误则中断，会继续校验下个字段
 module.exports.register = validator([
     body('name')
-        .notEmpty().withMessage('name is empty').bail()
-        .isLength({ min: 3 }).withMessage('minLength is 3').bail(),
+        .notEmpty().withMessage('name is empty').bail(),
+    // .isLength({ min: 3 }).withMessage('minLength is 3').bail(),
     body('email')
         .notEmpty().withMessage('email is empty').bail()
         .isEmail().withMessage('email format is error').bail()

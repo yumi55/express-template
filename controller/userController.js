@@ -3,6 +3,7 @@ const { createToken } = require('../util/jwt')
 const fs = require('fs')
 const { promisify } = require('util')
 const rename = promisify(fs.rename)
+const lodash = require('lodash')
 exports.register = async (req, res) => {
     const userModel = new User(req.body)
     const dbBack = await userModel.save()
@@ -213,8 +214,64 @@ exports.unfollow = async (req, res) => {
         res.status(500).json({ msg: '取消关注失败' })
     }
 }
-// 粉丝列表
 // 关注列表
+exports.followList = async (req, res) => {
+    try {
+        // 有searchId则查具体用户的列表
+        const { searchId } = req.body
+
+        if (!searchId && !req.user) {
+            return res.status(401).json({ msg: '未登录，searchId为必填' })
+        }
+        // 无searchId则查自己的关注列表
+        const userId = searchId || req.user.userInfo._id
+        let list = await Follow.find({
+            userId: userId
+        }).populate('followId')
+        list = list.map(item => {
+            return lodash.pick(item.followId, [
+                '_id',
+                'name',
+                'fansCount',
+                'followCount',
+                'cover',
+            ])
+        })
+        res.status(200).json({ list })
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({ msg: e })
+    }
+}
+// 粉丝列表
+exports.fansList = async (req, res) => {
+    try {
+        // 有searchId则查具体用户的列表
+        const { searchId } = req.body
+        if (!searchId && !req.user) {
+            return res.status(401).json({ msg: '未登录，searchId为必填' })
+        }
+        // 无searchId则查自己的关注列表
+        const followId = searchId || req.user.userInfo._id
+        let list = await Follow.find({
+            followId
+        }).populate('userId')
+        console.log(list)
+        list = list.map(item => {
+            return lodash.pick(item.userId, [
+                '_id',
+                'name',
+                'fansCount',
+                'followCount',
+                'cover',
+            ])
+        })
+        res.status(200).json({ list })
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({ msg: e })
+    }
+}
 exports.template = async (req, res) => {
     try {
 

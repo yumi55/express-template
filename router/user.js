@@ -16,5 +16,9 @@ router
     .post('/unlike/:id', verifyToken(), userController.unlike)// 取消点赞博客
     .post('/follow/:id', verifyToken(), userController.follow) // 关注用户
     .post('/unfollow/:id', verifyToken(), userController.unfollow) // 取消关注用户
+    // 看其他用户的关注列表
+    // 看自己的关注列表
+    .get('/follow', verifyToken(false), userController.followList) // 关注列表
+    .get('/fans', verifyToken(false), userController.fansList) // 粉丝列表
 
 module.exports = router;
