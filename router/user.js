@@ -13,6 +13,8 @@ router
     .get('/list', verifyToken(), userController.list) // 获取列表
     .delete('/:id', verifyToken(), userController.delete) // 删除
     .post('/like/:id', verifyToken(), userController.like) // 点赞博客
-    .post('/unlike/:id', verifyToken(), userController.unlike); // 取消点赞博客
+    .post('/unlike/:id', verifyToken(), userController.unlike)// 取消点赞博客
+    .post('/follow/:id', verifyToken(), userController.follow) // 关注用户
+    .post('/unfollow/:id', verifyToken(), userController.unfollow) // 取消关注用户
 
 module.exports = router;

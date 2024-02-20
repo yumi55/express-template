@@ -26,6 +26,14 @@ const userSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
+    fansCount: {
+        type: Number,
+        default: 0
+    },
+    followCount: {
+        type: Number,
+        default: 0
+    },
     ...baseModel
 })
 

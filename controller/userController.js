@@ -1,4 +1,4 @@
-const { User, Like } = require('../model/index')
+const { User, Like, Follow } = require('../model/index')
 const { createToken } = require('../util/jwt')
 const fs = require('fs')
 const { promisify } = require('util')
@@ -136,3 +136,89 @@ exports.unlike = async (req, res) => {
         res.status(500).json({ msg: e })
     }
 };
+// 关注用户
+exports.follow = async (req, res) => {
+    try {
+        const { id: followId } = req.params
+        const userId = req.user.userInfo._id
+
+        if (followId === userId) {
+            return res.status(401).json({ msg: '不可以关注自己' })
+        }
+        // 判断是否id有效
+        User.findById(followId).then(async (followUser) => {
+            const record = await Follow.findOne({
+                userId,
+                followId
+            })
+            if (!record) {
+                await new Follow({
+                    userId,
+                    followId
+                }).save()
+                followUser.fansCount++
+                followUser.save()
+                const currentUser = await User.findById(userId)
+                currentUser.followCount++
+                currentUser.save()
+                res.status(200).json({ msg: '关注成功' })
+            } else {
+                res.status(401).json({ msg: '你已经关注过' })
+            }
+        }).catch((err) => {
+            console.log(err)
+            res.status(401).json({ msg: '用户不存在' })
+        })
+
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({ msg: '关注失败' })
+    }
+}
+// 取消关注
+exports.unfollow = async (req, res) => {
+    try {
+        const { id: unfollowId } = req.params
+        const userId = req.user.userInfo._id
+
+        if (unfollowId === userId) {
+            return res.status(401).json({ msg: '不可以取消关注自己' })
+        }
+
+        // 判断是否id有效
+        User.findById(unfollowId).then(async (unfollowUser) => {
+            console.log(unfollowUser, 1)
+            const record = await Follow.findOne({
+                userId,
+                followId: unfollowId
+            })
+            if (record) {
+                await Follow.deleteOne({ _id: record._id })
+                unfollowUser.fansCount--
+                await unfollowUser.save()
+                const currentUser = await User.findById(userId)
+                currentUser.followCount--
+                await currentUser.save()
+                res.status(200).json({ msg: '取消关注成功' })
+            } else {
+                res.status(401).json({ msg: '你未关注过该用户' })
+            }
+        }).catch((err) => {
+            console.log(err)
+            res.status(401).json({ msg: '用户不存在' })
+        })
+
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({ msg: '取消关注失败' })
+    }
+}
+// 粉丝列表
+// 关注列表
+exports.template = async (req, res) => {
+    try {
+
+    } catch (e) {
+        // res.status(500).json({ msg: e })
+    }
+}
