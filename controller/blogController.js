@@ -1,5 +1,6 @@
 const { Blog, Like } = require('../model/index')
 const lodash = require('lodash')
+const { getHotLike } = require('../model/redis/hotLike')
 exports.add = async (req, res) => {
     try {
         const add = req.body
@@ -57,10 +58,13 @@ exports.detail = async (req, res) => {
         res.status(500).json({ msg: e })
     }
 }
-exports.template = async (req, res) => {
+exports.hotList = async (req, res) => {
     try {
-        // res.status(200).json({ dbBack })
+        const nums = req.params.nums
+        const list = await getHotLike(nums)
+        const total = list.length
+        res.status(200).json({ list, total })
     } catch (e) {
-        // res.status(500).json({ msg: e })
+        res.status(500).json({ msg: e })
     }
 }

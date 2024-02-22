@@ -4,6 +4,7 @@ const fs = require('fs')
 const { promisify } = require('util')
 const rename = promisify(fs.rename)
 const lodash = require('lodash')
+const { hotLike } = require('../model/redis/hotLike')
 exports.register = async (req, res) => {
     const userModel = new User(req.body)
     const dbBack = await userModel.save()
@@ -104,6 +105,7 @@ exports.like = async (req, res) => {
             const user = await User.findById(userId)
             user.likes ? user.likes.push(blogId) : [blogId]
             user.save()
+            hotLike(blogId, 1)
             res.status(200).json({ msg: '点赞博客成功！' })
         } else {
             res.status(500).json({ msg: '你已经点赞了！' })
@@ -188,7 +190,6 @@ exports.unfollow = async (req, res) => {
 
         // 判断是否id有效
         User.findById(unfollowId).then(async (unfollowUser) => {
-            console.log(unfollowUser, 1)
             const record = await Follow.findOne({
                 userId,
                 followId: unfollowId

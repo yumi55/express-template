@@ -6,6 +6,7 @@ const { verifyToken } = require('../util/jwt')
 router
     .post('/', verifyToken(), blogValidator.add, blogController.add)
     .get('/list', verifyToken(), blogController.list)
-    .get('/:id', verifyToken(false), blogController.detail)
+    .get('/hotList', blogController.hotList)
+    .get('/detail/:id', verifyToken(false), blogController.detail)
 
 module.exports = router;
